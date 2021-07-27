@@ -47,7 +47,7 @@ class AssesmentController extends Controller
     public function create()
     {
         //
-        echo "tesmi";
+        
        
     }
 
