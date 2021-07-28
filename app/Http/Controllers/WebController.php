@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\profile;
+use App\Models\Profile;
 use App\Models\Post;
 
 
@@ -12,7 +12,7 @@ class WebController extends Controller
 
     public function index()
     {
-        $data['menuProfil'] = profile::all();
+        $data['menuProfil'] = Profile::all();
         return view('web.home', [
             "data" => $data,
             "title" => 'Beranda'
