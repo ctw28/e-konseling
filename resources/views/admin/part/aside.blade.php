@@ -16,7 +16,7 @@
                             alt="User Image">
                     </div>
                     <div class="info">
-                        <a href="#" class="d-block">{{auth()->user()->name}}</a>
+                        <a href="#" class="d-block" id="user_name"></a>
                     </div>
                 </div>
                 <!-- Sidebar Menu -->
@@ -24,7 +24,7 @@
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                         data-accordion="false">
                         @if(auth()->user()->user_role_id==1)
-                        @include('admin.part.navigasi-user')
+                        @include('admin.part.navigasi-admin')
                         @elseif(auth()->user()->user_role_id==2)
                         @include('admin.part.navigasi-konselor')
                         @elseif(auth()->user()->user_role_id==3)

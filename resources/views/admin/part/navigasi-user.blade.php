@@ -5,9 +5,12 @@
         <p>Dashboard</p>
     </a>
 </li>
+
 <li class="nav-item">
-    <a href="{{route('assesment.form')}}" class="nav-link">
-        <i class="nav-icon fas fa-tachometer-alt"></i>
-        <p>Asesmen</p>
+    <a href="{{route('konseling.data')}}" class="nav-link">
+        <i class="nav-icon fas fa-th"></i>
+        <p>
+            Jadwal
+        </p>
     </a>
 </li>

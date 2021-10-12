@@ -19,6 +19,7 @@ class CreateKonselingSesisTable extends Migration
             $table->unsignedBigInteger('assesment_sesi_id')->unique();
             $table->string('konseling_kode',100);
             $table->enum('konseling_status',[0,1]);
+            $table->enum('konseling_setuju',[0,1]);
             $table->text('konseling_catatan');
             $table->timestamps();
 

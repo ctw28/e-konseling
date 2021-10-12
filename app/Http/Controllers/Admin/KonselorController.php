@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Admin\Konselor;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;   
-
+use Illuminate\Support\Facades\DB;
 
 class KonselorController extends Controller
 {
@@ -17,7 +18,10 @@ class KonselorController extends Controller
     public function index()
     {
         //
-        $dataKonselor = konselor::all();
+        $dataKonselor = Konselor::with(['userData'=>function($query){
+            $query->select(['id','iddata']);
+        }])->get();
+        // return $dataKonselor;
         return view("admin.konselor.index",[
             "data"=> $dataKonselor
         ]);
@@ -48,10 +52,20 @@ class KonselorController extends Controller
             'konselor_bidang' => 'required'
         ]);
 
-        Konselor::create($request->all());
-
-        return redirect()->route('admin.konselor')->with('message', \GeneralHelper::formatMessage('Berhasil menambahkan data !', 'success'));
-
+        DB::beginTransaction();
+        try{
+            $user = User::create(['iddata'=> $request->konselor_pegawai_id, "password"=>bcrypt('1234qwer'), 'user_role_id'=> 2 ]);
+            Konselor::create([
+                "user_id"=>$user->id,
+                'konselor_bidang' => $request->konselor_bidang,
+                'konselor_keterangan' => $request->konselor_keterangan
+            ]);
+            DB::commit();
+            return redirect()->route('admin.konselor')->with('message', \GeneralHelper::formatMessage('Berhasil menambahkan data !', 'success'));
+        }catch(\Exception $e){
+            DB::rollback();
+            return redirect()->route('admin.konselor')->with('message', \GeneralHelper::formatMessage('Ada kesalahan !', 'Failed'));
+        }
     }
 
     /**

@@ -4,7 +4,11 @@ namespace App\Http\Controllers\User;
 
 use App\Models\Assesment;
 use App\Models\AssesmentAnswer;
+use App\Models\AssesmentJenisAum;
 use App\Models\AssesmentSesi;
+use App\Models\Admin\KonselingSesi;
+use App\Models\KonselingDaftarTunggu;
+
 use Illuminate\Http\Request;
 use App\Models\Profile;
 use Illuminate\Support\Facades\DB;
@@ -20,20 +24,35 @@ class AssesmentController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function index(){
-        return view("user.dashboard");
+    public function info(){
+        
+        return view("user.assesment.info");
     }
     public function startSesi(Request $request){
-        $create = AssesmentSesi::create($request->all());
-        return $create;
+        $checkSesi = AssesmentSesi::where(['user_id'=>$request->user_id,'sesi_status'=>"0"])->first();
+        // $allowAssesment = AssesmentSesi::where('user_id', $request->user_id)->orderBy('sesi_tanggal','desc  ')->first();
+        // return $allowAssesment;
+        // if($allowAssesment->sesi_status=="1"){
+        //     return redirect()->route('assesment.score',Crypt::encrypt($allowAssesment->id));
+        // }
+        // if($allowAssesment->sesi_status=="0"){
+        //     return redirect()->route('assesment.form',Crypt::encrypt($allowAssesment->id));
+        // }
 
+        if($checkSesi==null){
+            $create = AssesmentSesi::create($request->all());
+            return redirect()->route('assesment.form',Crypt::encrypt($create->id));
+        }
+        return redirect()->route('assesment.form',Crypt::encrypt($checkSesi->id));
+            
     }
-    public function form()
+    public function form($id)
     {
         //
         // $data['dataSesi'] = AssesmentSesi::where(['iddata' => 1720185975,'sesi_status'=>"0"])->get();
-        $data['dataSesi'] = AssesmentSesi::where(['user_id' => auth()->user()->id])->get();
+        $data['dataSesi'] = AssesmentSesi::find(Crypt::decrypt($id));
         // return auth()->user()->id;
+        // return $data;
         return view("user.assesment.form", [
             "data" => $data
         ]);
@@ -81,13 +100,10 @@ class AssesmentController extends Controller
      * @param  \App\Models\Assesment  $assesment
      * @return \Illuminate\Http\Response
      */
-    public function show($no_urut)
+    public function show($id, $no_urut)
     {
-        $data =  Assesment::where('no_urut', $no_urut)->get();        
-        $data->map(function($data){
-            $jawaban = AssesmentAnswer::where(['assesment_id' => $data->id, 'assesment_sesi_id'=>2])->get();
-            (count($jawaban)>0) ? $data['jawaban'] = $jawaban[0]->jawaban : $data['jawaban']="";
-        });
+        $data['jawaban'] = AssesmentAnswer::where(['assesment_sesi_id'=> $id,'assesment_id'=>$no_urut])->first();
+        $data['soal'] = Assesment::where('no_urut', $no_urut)->first();
         return $data;
     }
 
@@ -99,20 +115,19 @@ class AssesmentController extends Controller
             $sesi->update(
                 ['sesi_status' => "1"]
             );
-            $data = DB::select('SELECT assesment_jenis_aums.jenis_aum, assesment_jenis_aums.singkatan, COUNT(COALESCE(assesment_jenis_aums.singkatan,0)) as jumlah 
-            FROM assesments 
-            INNER JOIN assesment_jenis_aums ON assesment_jenis_aums.id = assesments.jenis_aum_id 
-            INNER JOIN assesment_jawabans ON assesment_jawabans.assesment_id=assesments.id 
-            WHERE assesment_jawabans.assesment_id IN (SELECT assesment_id FROM assesment_jawabans) AND assesment_jawabans.jawaban="1" 
-            GROUP BY assesment_jenis_aums.singkatan');
-            collect($data)->map(function($data){
-                $bobot = round($data->jumlah / 30 * 100, 2);
+            $assesmentSesiId = $sesi->id;
+            $data = AssesmentJenisAum::withCount(['answers'=> function($assesment) use($assesmentSesiId){
+                        $assesment->where(['assesment_sesi_id' => $assesmentSesiId,'jawaban'=>"1"]);
+                    }])->orderBy('answers_count', 'desc')->limit(3)->get();
+            $data->map(function($data){
+                $bobot = round($data->answers_count / 30 * 100, 2);
                 $classification = (object) $this->getClassification($bobot);
                 $data->bobot = $bobot;
                 $data->predikat = $classification->predikat;
-                $data->keterangan = $classification->keterangan;            
+                $data->keterangan = $classification->keterangan;  
+                unset($data->answers);
             });
-            
+            // return $data;
             return view("user.assesment.score", [
                 "data" => $data,
                 "id" => $id
@@ -127,8 +142,18 @@ class AssesmentController extends Controller
     public function next(Request $request, $id){
         $next = AssesmentSesi::findOrFail(Crypt::decrypt($id));
         $next->update(
-            ['sesi_catatan' => $request->sesi_catatan]
+            [
+                'sesi_catatan' => $request->sesi_catatan,
+                'lanjut_konseling' => "1"
+            ]
         );
+        $save = KonselingDaftarTunggu::insert(
+                [
+                    'assesment_sesi_id'=>$next->id
+                ]);
+
+        // return $save;
+        
         return view("user.assesment.finish"); 
     }
     

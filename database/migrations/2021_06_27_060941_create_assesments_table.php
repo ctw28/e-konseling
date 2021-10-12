@@ -19,10 +19,10 @@ class CreateAssesmentsTable extends Migration
             $table->string('soal');
             $table->smallInteger('soal_sebelum')->nullable();
             $table->smallInteger('soal_setelah')->nullable();
-            $table->unsignedBigInteger('jenis_aum_id');
+            $table->unsignedBigInteger('assesment_jenis_aum_id');
             $table->timestamps();
 
-            $table->foreign('jenis_aum_id')->references('id')->on('assesment_jenis_aums');
+            $table->foreign('assesment_jenis_aum_id')->references('id')->on('assesment_jenis_aums');
 
         });
     }

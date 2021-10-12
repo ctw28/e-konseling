@@ -15,7 +15,7 @@ class KonselingJadwal extends Model
     ];
 
     public function konselingSesiData(){
-        return $this->hasOne('App\Models\Admin\KonselingSesi','id','konseling_sesi_id');
+        return $this->belongsTo('App\Models\Admin\KonselingSesi','konseling_sesi_id');
     }
     // public function setKonselingTanggalAttribute($value)
     // {

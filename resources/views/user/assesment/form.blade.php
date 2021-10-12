@@ -59,7 +59,7 @@
         <div id="questionButton" style="margin-top:20px">
             <button class="btn btn-info" id="btnNext"><i class="fa fa-save"></i>&nbsp Simpan dan Lanjut</button>
             <button class="btn btn-default" id="btnSkip">Lewati</button>
-            <a href="{{route('assesment.score',Crypt::encrypt($data['dataSesi'][0]->id))}}" class="btn btn-warning"
+            <a href="{{route('assesment.score',Crypt::encrypt($data['dataSesi']->id))}}" class="btn btn-warning"
                 id="btnFinish">Selesai</a>
         </div>
     </div>
@@ -106,7 +106,7 @@ async function navigationQuestions(page) { //untuk mengeset navgiasi
 
     let answeredQuestion = []
     let url = "{{route('assesment.get.jawab',':sessionId')}}" //ambil nomor-nomor soal yang sudah dijawab    
-    url = url.replace(':sessionId', "{{$data['dataSesi'][0]->id}}")
+    url = url.replace(':sessionId', "{{$data['dataSesi']->id}}")
     let response = await fetch(url)
     let responseMessage = await response.json()
     responseMessage.map(row => {
@@ -145,8 +145,9 @@ async function navigationQuestions(page) { //untuk mengeset navgiasi
 }
 
 async function getQuestion(no_urut) { //menampilkan pertanyaan sesuai nomor yang dipilih
-    let url = "{{route('assesment.get.soal',':id')}}"
-    url = url.replace(':id', no_urut)
+    let url = "{{route('assesment.get.soal',[':id',':no_urut'])}}"
+    url = url.replace(':id', "{{$data['dataSesi']->id}}")
+    url = url.replace(':no_urut', no_urut)
     let response = await fetch(url)
     let responseMessage = await response.json()
     if (responseMessage.length == 0) {
@@ -154,32 +155,20 @@ async function getQuestion(no_urut) { //menampilkan pertanyaan sesuai nomor yang
         navigationQuestions(0)
         return
     }
-
-    document.querySelector('#question').innerText = `${responseMessage[0].no_urut}. ${responseMessage[0].soal}`
+    document.querySelector('#question').innerText = `${responseMessage.soal.no_urut}. ${responseMessage.soal.soal}`
 
     let buttonSaveNext = document.querySelector('#btnNext')
     buttonSaveNext.onclick = function() {
-        saveAndGoToNextQuestion(responseMessage[0].id, responseMessage[0].no_urut)
+        saveAndGoToNextQuestion(responseMessage.soal.id, responseMessage.soal.no_urut)
     }
-    // buttonSaveNext.setAttribute('onclick',`saveAndGoToNextQuestion(${responseMessage[0].id} , ${responseMessage[0].no_urut})`)
     let buttonSkip = document.querySelector('#btnSkip')
     buttonSkip.onclick = function() {
-        goToQuestion(responseMessage[0].soal_setelah)
-        // let jawaban = document.querySelector('input[name="jawaban"]:checked')
-        // if (jawaban !== null) {
-        //     if (confirm('tidak ingin simpan jawaban?')) goToQuestion(responseMessage[0].soal_setelah)
-        // } else {
-        //     goToQuestion(responseMessage[0].soal_setelah)
-        // }
+        goToQuestion(responseMessage.soal.soal_setelah)
     }
-    // buttonSkip.setAttribute('onclick', `goToQuestion(${responseMessage[0].soal_setelah})`)
     let yesAnswer = document.querySelector('#jawaban_ya')
     let noAnswer = document.querySelector('#jawaban_tidak')
-
-    if (responseMessage[0].jawaban === "1") {
-        yesAnswer.checked = true
-    } else if (responseMessage[0].jawaban === "0") {
-        noAnswer.checked = true
+    if (responseMessage.jawaban != null) {
+        (responseMessage.jawaban.jawaban === "1") ? yesAnswer.checked = true: noAnswer.checked = true
     } else {
         yesAnswer.checked = false
         noAnswer.checked = false
@@ -204,7 +193,7 @@ async function saveAndGoToNextQuestion(id, no_urut) { //simpan jawaban dan menuj
     if (jawaban === null) return alert('Mohon pilih jawaban')
     let dataSend = new FormData()
     dataSend.append('assesment_id', id)
-    dataSend.append('assesment_sesi_id', "{{$data['dataSesi'][0]->id}}")
+    dataSend.append('assesment_sesi_id', "{{$data['dataSesi']->id}}")
     dataSend.append('jawaban', jawaban.value)
     let response = await fetch("{{route('assesment.save')}}", {
         method: "POST",

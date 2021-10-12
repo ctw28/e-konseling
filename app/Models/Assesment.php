@@ -14,12 +14,21 @@ class Assesment extends Model
         'soal',
         'soal_sebelum',
         'soal_setelah',
-        'jenis_aum_id'
+        'assesment_jenis_aum_id'
     ];
+
+    public function answerData(){
+        return $this->hasOne('App\Models\AssesmentAnswer');
+    }
+
+    public function jenisAumData()
+    {
+        return $this->belongsTo('App\Models\AssesmentJenisAum');
+    }
 
     public function getAssesmentJenisAumById()
     {
-        return $this->belongsTo('App\Models\AssesmentJenisAum', 'jenis_aum_id', 'id');
+        return $this->belongsTo('App\Models\AssesmentJenisAum', 'assesment_jenis_aum_id', 'id');
     }
     
     public function getAnswer()

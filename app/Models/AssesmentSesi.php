@@ -15,11 +15,21 @@ class AssesmentSesi extends Model
         'user_id',
         'sesi_kode',
         'sesi_status',
+        'lanjut_konseling',
         'sesi_catatan'
     ];
 
+    public function userData(){
+        return $this->belongsTo('App\Models\User','user_id','id');
+    }
+    
+    
+    public function assesmentAnswerData(){
+        return $this->hasMany('App\Models\AssesmentAnswer');
+    }
+    
     public function assesmentJawabanData(){
-        return $this->hasMany('App\Models\Assesment_jawaban','assesment_sesi_id');
+        return $this->hasMany('App\Models\AssesmentAnswer','assesment_sesi_id');
     }
 
     public function getUpdatedAtColumn() {

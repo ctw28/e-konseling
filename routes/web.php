@@ -21,6 +21,9 @@ Route::get('/login', 'App\Http\Controllers\User\LoginController@index')->name('l
 // Route::post('/cek', 'App\Http\Controllers\User\LoginController@cek')->name('cek');
 
 
+Route::group(['prefix' => 'admin'], function () {
+    Route::get('/dashboard', 'App\Http\Controllers\Admin\DashboardController@index')->name('admin.dashboard');
+});
 Route::group(['prefix' => 'admin/profil'], function () {
     Route::get('/', 'App\Http\Controllers\Admin\ProfileController@index')->name('admin.profile');
     Route::get('/tambah-data', 'App\Http\Controllers\Admin\ProfileController@create')->name('admin.profile.create');
@@ -43,9 +46,9 @@ Route::get('/psikoedukasi/{slug}', 'App\Http\Controllers\WebController@post')->n
 
 Route::group(['middleware' => ['web','auth'],'prefix' => 'user'],function(){
     Route::post('/start-sesi', 'App\Http\Controllers\User\AssesmentController@startSesi')->name('assesment.start');
-    Route::get('/', 'App\Http\Controllers\User\AssesmentController@create')->name('assesment.info');
-    Route::get('/form', 'App\Http\Controllers\User\AssesmentController@form')->name('assesment.form');
-    Route::get('/skor/{id}', 'App\Http\Controllers\User\AssesmentController@getScore')->name('assesment.score');
+    Route::get('/asesmen-info', 'App\Http\Controllers\User\AssesmentController@info')->name('assesment.info');
+    Route::get('/asesmen/sesi/{id}', 'App\Http\Controllers\User\AssesmentController@form')->name('assesment.form');
+    Route::get('/asesmen/sesi/hasil/{id}', 'App\Http\Controllers\User\AssesmentController@getScore')->name('assesment.score');
     Route::post('/lanjut/{id}', 'App\Http\Controllers\User\AssesmentController@next')->name('assesment.next');
 
     // Route::get('/login', 'App\Http\Controllers\User\LoginController@index')->name('user.login');
@@ -57,16 +60,20 @@ Route::group(['prefix' => 'admin/konselor'], function () {
     Route::get('/', 'App\Http\Controllers\Admin\KonselorController@index')->name('admin.konselor');
     Route::get('/tambah-data', 'App\Http\Controllers\Admin\KonselorController@create')->name('admin.konselor.create');
     Route::post('/simpan', 'App\Http\Controllers\Admin\KonselorController@store')->name('admin.konselor.store');
-
+    
+});
+Route::group(['middleware' => ['web','auth'],'prefix' => 'konselor'],function(){
+    Route::group(['prefix' => 'konseling'], function () {
+        Route::get('/', 'App\Http\Controllers\Konselor\KonselingJadwalController@index')->name('konseling.data');
+        Route::get('/atur-jadwal/{konselingSesiId}', 'App\Http\Controllers\Konselor\KonselingJadwalController@setSchedule')->name('konseling.set');
+    });
+    Route::get('/dashboard', 'App\Http\Controllers\Konselor\DashboardController@index')->name('konselor.dashboard');
 });
 Route::group(['prefix' => 'admin/konseling'], function () {
     Route::get('/jadwal-tunggu', 'App\Http\Controllers\Admin\KonselingSesiController@index')->name('admin.conseling.wait');
 });
 
-Route::group(['prefix' => 'konseling'], function () {
-    Route::get('/', 'App\Http\Controllers\Konselor\KonselingJadwalController@index')->name('konseling.data');
-    Route::get('/atur-jadwal/{konselingSesiId}', 'App\Http\Controllers\Konselor\KonselingJadwalController@setSchedule')->name('konseling.set');
-});
 Auth::routes();
 
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

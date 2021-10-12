@@ -16,13 +16,26 @@ class AssesmentAnswer extends Model
         'jawaban'
     ];
 
+
+
+    public function asesmenData()
+    {
+        return $this->belongsTo('App\Models\Assesment');
+    }
+
+    public function assesmentSesiData()
+    {
+        return $this->belongsTo('App\Models\AssesmentSesi');
+    }
+
     public function getAssesmentById()
     {
         return $this->belongsTo('App\Models\Assesment','assesment_id','id');
     }
     
-    public function assesmentSesiData()
-    {
-        return $this->belongsTo('App\Models\AssesmentSesi','assesment_sesi_id','id');
+
+    public function answers(){
+        return $this->hasManyThrough('App\Models\AssesmentAnswer','App\Models\AssesmentSesi');
     }
+
 }

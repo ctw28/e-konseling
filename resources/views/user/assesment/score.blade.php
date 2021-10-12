@@ -1,13 +1,13 @@
 @extends('admin.template')
 @section('css')
 <!-- summernote -->
-<link rel="stylesheet" href="../../template-admin/plugins/summernote/summernote-bs4.min.css">
+<link rel="stylesheet" href="{{asset('template-admin')}}/plugins/summernote/summernote-bs4.min.css">
 @endsection
 
 @section('content')
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">Hasil Tes Anda <span id="tes"></span></h3>
+        <h3 class="card-title">Hasil Asesmen <span id="tes"></span></h3>
     </div>
     <div class="card-body">
         <table class="table table-hover table table-bordered table-striped">
@@ -38,15 +38,15 @@
     <div class="card-footer">
         <form action="{{route('assesment.next',$id)}}" method="POST" class="form-horizontal form-label-left">
             @csrf
-            <div class="form-check">
+            <!-- <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="setuju" name="setuju">
                 <label for="sesi_catatan" class="form-check-label">saya menyetujui Lorem ipsum dolor sit amet
                     consectetur adipisicing elit.
                     Velit
                     faceresequi dolores a voluptate non commodi! Culpa, delectus?</label>
-            </div>
+            </div> -->
             <div class="form-group">
-                <label for="sesi_catatan">Berikan Catatan untuk konselor</label>
+                <label for="sesi_catatan">Berikan catatan untuk konselor / Deskripsi permasalahan</label>
                 <textarea name="sesi_catatan" id="sesi_catatan">{{old('sesi_catatan')}}</textarea>
             </div>
             <input type="submit" value="Lanjut Konsultasi" class="btn btn-primary">
@@ -59,7 +59,7 @@
 
 @section('js')
 <!-- Summernote -->
-<script src="../../template-admin/plugins/summernote/summernote-bs4.min.js"></script>
+<script src="{{asset('template-admin')}}/plugins/summernote/summernote-bs4.min.js"></script>
 
 <!-- Page specific script -->
 <script>

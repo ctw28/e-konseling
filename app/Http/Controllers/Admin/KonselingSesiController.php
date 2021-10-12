@@ -7,6 +7,8 @@ use App\Models\Admin\KonselingSesi;
 use App\Models\Admin\Konselor;
 use App\Models\AssesmentSesi;
 use Illuminate\Http\Request;
+use App\Models\KonselingDaftarTunggu;
+
 
 class KonselingSesiController extends Controller
 {
@@ -18,10 +20,16 @@ class KonselingSesiController extends Controller
     public function index()
     {
         //
-        $data = AssesmentSesi::all();
-        $konselor = konselor::all();
+        $data = KonselingDaftarTunggu::with(['assesmentSesiData'=> function($query){
+            $query->with(['userData'=>function($user){
+                $user->select(['id','iddata']);
+            }]);
+        }])->get();
+        // return $data;
+        $konselor = Konselor::with(['userData'])->get();
+        // return $konselor;
         return view('admin.konseling.daftar-tunggu',[
-            "data" => $data,
+            "data" => collect($data),
             "konselor" => $konselor
         ]);
     }

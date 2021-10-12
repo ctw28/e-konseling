@@ -15,10 +15,12 @@ class CreateKonselorsTable extends Migration
     {
         Schema::create('konselors', function (Blueprint $table) {
             $table->id();
-            $table->string('konselor_pegawai_id',100); //ambil dari API data pegawai SIA 
+            $table->unsignedBigInteger('user_id');
             $table->string('konselor_bidang',100);
             $table->text('konselor_keterangan');
             $table->timestamps();
+            $table->foreign('user_id')->references('id')->on('users');
+
         });
     }
 

@@ -18,6 +18,7 @@ class CreateAssesmentSesisTable extends Migration
             $table->unsignedBigInteger('user_id'); //ini dari iddata SIA diambil
             $table->string('sesi_kode',200);
             $table->enum('sesi_status',[0,1]);
+            $table->enum('lanjut_konseling',[0,1])->default(0);
             $table->text('sesi_catatan')->nullable();
             $table->timestamp('sesi_tanggal')->nullable();
 

@@ -13,4 +13,9 @@ class AssesmentJenisAum extends Model
         'jenis_aum',
         'singkatan'
     ];
+
+    public function answers(){
+        return $this->hasManyThrough('App\Models\AssesmentAnswer','App\Models\Assesment');
+    }
+
 }

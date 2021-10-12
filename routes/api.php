@@ -24,7 +24,7 @@ Route::group(['prefix' => 'profil'], function () {
 });
 
 Route::group(['prefix' => 'assesment'], function () {
-    Route::get('/soal/{id}', 'App\Http\Controllers\User\AssesmentController@show')->name('assesment.get.soal');
+    Route::get('/soal/{id}/no_urut/{no_urut}', 'App\Http\Controllers\User\AssesmentController@show')->name('assesment.get.soal');
     Route::get('/terjawab/{sessionId}', 'App\Http\Controllers\User\AssesmentController@getAnswered')->name('assesment.get.jawab');
     Route::post('/simpan', 'App\Http\Controllers\User\AssesmentController@store')->name('assesment.save');
 });
@@ -33,6 +33,7 @@ Route::group(['prefix' => 'konseling'], function () {
     Route::post('/simpan', 'App\Http\Controllers\Admin\KonselingSesiController@store')->name('konseling.save');
     Route::post('/save', 'App\Http\Controllers\Konselor\KonselingJadwalController@store')->name('konseling.store');
     Route::get('/delete/{id}', 'App\Http\Controllers\Konselor\KonselingJadwalController@destroy')->name('konseling.delete');
+    Route::post('/finish', 'App\Http\Controllers\Konselor\KonselingJadwalController@finish')->name('konseling.finish');
 
 });
 

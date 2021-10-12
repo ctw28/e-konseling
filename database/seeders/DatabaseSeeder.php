@@ -15,11 +15,16 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // \App\Models\User::factory(10)->create();
-        DB::table('users_roles')->insert(
+        DB::table('users_roles')->insert([
             ['nama_role' => 'admin'],
             ['nama_role' => 'konselor'],
             ['nama_role' => 'user']
-        );
+        ]);
+        DB::table('users')->insert([
+            'iddata' => 'admin_konseling',
+            'password' => bcrypt('1234qwer'),
+            'user_role_id' => 1
+        ]);
 
         DB::table('assesment_jenis_aums')->insert([
             ['jenis_aum' => 'Perkembangan Kesehatan Jasmani', 'singkatan' => 'PJK'],
@@ -35,22 +40,7 @@ class DatabaseSeeder extends Seeder
             ['jenis_aum' => 'Kurikulum dan Prosedur Pengajaran', 'singkatan' => 'KPP']
         ]);
         
-        // DB::table('assesment_sesis')->insert([
-        //     'user_id' => '1', 
-        //     'sesi_kode' => 'xxxxxxx', 
-        //     "sesi_catatan" => "",
-        //     "sesi_status" => "0",
-        //     "sesi_tanggal"=>"2021-07-14 03:13:24"        
-        // ]);
-
-        // $user = [
-        //     [
-        //         'name' => '123456',
-        //         'email' => 'gg@gmail.com',
-        //         'password' => bcrypt('1234qwer')
-        //     ]
-
-        // ];
+        
         // DB::table('users')->insert($user);
     }
     

@@ -48,40 +48,52 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {   
-        $input = $request->all();
-        // dd($input);
         $this->validate($request, [
-            'nim' => 'required',
+            'user' => 'required',
             'password' => 'required',
         ]);
-
-
-        $response = Http::asForm()->withOptions(['verify' => false,])->post('https://sia.iainkendari.ac.id/konseling_api/login_mhs',[
-            'nim' => $input['nim'],
-            'password' => $input['password'],
-        ]);
-        // return $input['nim'];
-        if($response->json()['status']){            
-            $iddata = $response->json()['data'][0]['iddata'];
-            // return $iddata;
-            $user = User::where('iddata', $iddata)->first();
-            if($user==null){
-                User::create(['iddata'=> $iddata, "password"=>bcrypt('1234qwer'), 'user_role_id'=>1]);
+        $input = $request->all();
+        
+        if($input['kategori']=="admin"){
+            if(auth()->attempt(array('iddata' => $input['user'], 'password' => "1234qwer")))
+                return redirect()->route('admin.dashboard');
+            return redirect()->route('login')->with('error','Anda belum terdaftar.');
+        }else{
+            if($input['kategori']=="konselor"){
+                $data = [
+                    "url" => "https://sia.iainkendari.ac.id/konseling_api/login_konselor",
+                    "user" => "nip",
+                    "id" => "idpegawai",
+                    "redirect" => "konselor.dashboard",
+                    "role" => 2  
+                ];
             }
-            if(auth()->attempt(array('iddata' => $iddata, 'password' => "1234qwer")))
-            {
-                return redirect()->route('user.dashboard');
-                // if (auth()->user()->iddata == 1) {
-                //     return redirect()->route('assesment.form');
-                // }else{
-                //     return redirect()->route('assesment.form');
-                // }
-            }else{
+            if($input['kategori']=="mahasiswa"){
+                $data = [
+                    "url" => "https://sia.iainkendari.ac.id/konseling_api/login_mhs",
+                    "user" => "nim",
+                    "id" => "iddata",
+                    "redirect" => "user.dashboard",
+                    "role" => 3  
+                ];
+            }        
+            $response = Http::asForm()->withOptions(['verify' => false,])->post($data['url'],[
+                $data['user'] => $input['user'],
+                'password' => $input['password'],
+            ]);
+
+            if($response->json()['status']){
+                $id = $response->json()['data'][0][$data['id']];
+                $user = User::where('iddata', $id)->first();
+                if($user==null)
+                    User::create(['iddata'=> $id, "password"=>bcrypt('1234qwer'), 'user_role_id'=>$data['role']]);
+                if(auth()->attempt(array('iddata' => $id, 'password' => "1234qwer")))
+                    return redirect()->route($data['redirect']);
                 return redirect()->route('login')->with('error','Anda belum terdaftar.');
             }
+            // return $response->body();
+            return redirect()->route('login')->with('error','Email-Address And Password Are Wrong.');
         }
-        // return $response->body();
-        return redirect()->route('login')->with('error','Email-Address And Password Are Wrong.');
           
-    }
+    }   
 }

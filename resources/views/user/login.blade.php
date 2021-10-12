@@ -29,7 +29,7 @@
                 <form action="{{route('login')}}" method="post">
                     @csrf
                     <div class="input-group mb-3">
-                        <input type="text" name="nim" class="form-control" placeholder="NIM">
+                        <input type="text" name="user" class="form-control" placeholder="Usrname">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-envelope"></span>
@@ -38,6 +38,18 @@
                     </div>
                     <div class="input-group mb-3">
                         <input type="password" name="password" class="form-control" placeholder="Password">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-lock"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <select name="kategori">
+                            <option value="admin">Admin</option>
+                            <option value="konselor">Konselor</option>
+                            <option value="mahasiswa">Mahasiswa</option>
+                        </select>
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-lock"></span>

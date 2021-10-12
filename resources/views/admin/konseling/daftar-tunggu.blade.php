@@ -19,6 +19,7 @@
 <div class="card">
     <div class="card-header">
         <h3 class="card-title">Daftar Tunggu Konseling</h3>
+        
     </div>
     <div class="card-body">
         <table class="table table-hover table table-bordered table-striped">
@@ -39,14 +40,14 @@
                 @foreach ($data as $key=>$item)
                 <tr>
                     <th scope="row">{{$i++}}</th>
-                    <td>{{$item->sesi_kode}}</td>
-                    <td>{{$item->sesi_tanggal}}</td>
-                    <td><span id="nim_{{$item->iddata}}"></span></td>
-                    <td><span id="nama_{{$item->iddata}}"></span></td>
-                    <td><span id="hp_{{$item->iddata}}"></span></td>
-                    <td>{!!$item->sesi_catatan!!}</td>
+                    <td>{{$item->assesmentSesiData->sesi_kode}}</td>
+                    <td>{{$item->assesmentSesiData->sesi_tanggal}}</td>
+                    <td><span id="nim_{{$item->assesmentSesiData->userData->iddata}}"></span></td>
+                    <td><span id="nama_{{$item->assesmentSesiData->userData->iddata}}"></span></td>
+                    <td><span id="hp_{{$item->assesmentSesiData->userData->iddata}}"></span></td>
+                    <td>{!!$item->assesmentSesiData->sesi_catatan!!}</td>
                     <td>
-                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal-lg" onclick="chooseKonselor({{$item->id}})">
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal-lg" onclick="chooseKonselor({{$item->assesmentSesiData->id}})">
                             Pilih Konselor
                         </button>
                     </td>
@@ -82,8 +83,8 @@
                     @foreach ($konselor as $key=>$item)
                     <tr data-konselor-id="{{$item->id}}">
                         <th>{{$i++}}</th>
-                        <td><span id="nip_{{$item->konselor_pegawai_id}}"></span></td>
-                        <td><span id="nama_{{$item->konselor_pegawai_id}}"></span></td>
+                        <td><span id="nip_{{$item->userData->iddata}}"></span></td>
+                        <td><span id="nama_{{$item->userData->iddata}}"></span></td>
                         <td>{{$item->konselor_bidang}}</td>
                         <td>
                         </td>
@@ -112,8 +113,12 @@
     async function getDataMahasiswa() {
         let dataSend = new FormData()
         let idDataList = []
-        let mahasiswaList = {!!json_encode($data -> toArray()) !!}
-        mahasiswaList.forEach(data => idDataList.push(data.iddata))
+        let mahasiswaList = {!!json_encode($data->toArray()) !!}
+        mahasiswaList.forEach(data => {
+            // console.log(data.user_data.iddata)
+            idDataList.push(data.assesment_sesi_data.user_data.iddata)
+        })
+        console.log(idDataList);
         dataSend.append('iddata', JSON.stringify(idDataList))
 
         let response = await fetch("https://sia.iainkendari.ac.id/konseling_api/data_mahasiswa", {
@@ -123,9 +128,10 @@
         let responseMessage = await response.json()
         console.log(responseMessage)
         responseMessage.forEach(data => {
-            document.querySelector('#nim_' + data.iddata).innerHTML = data.nim
-            document.querySelector('#nama_' + data.iddata).innerHTML = data.nama
-            document.querySelector('#hp_' + data.iddata).innerHTML = data.hp
+            // console.log(data);
+            document.querySelector('#nim_' + data.iddata).innerText = data.nim
+            document.querySelector('#nama_' + data.iddata).innerText = data.nama
+            document.querySelector('#hp_' + data.iddata).innerText = data.hp
         });
 
     }
@@ -136,9 +142,9 @@
         let idPegawaiList = []
         let buttonSave = document.querySelector('#save')
         buttonSave.setAttribute('onclick', 'save('+assesment_id+')');
-
-        let pegawaiList = {!!json_encode($konselor -> toArray()) !!}
-        pegawaiList.forEach(data => idPegawaiList.push(data.konselor_pegawai_id))
+        let pegawaiList = {!!json_encode($konselor->toArray()) !!}
+        console.log(pegawaiList);
+        pegawaiList.forEach(data => idPegawaiList.push(data.user_data.iddata))
         dataSend.append('konselor_pegawai_id', JSON.stringify(idPegawaiList))
         let response = await fetch("https://sia.iainkendari.ac.id/konseling_api/data_konselor", {
             method: "POST",
